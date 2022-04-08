@@ -1,6 +1,18 @@
+##
+# `require` functionality for `mruby`.
+#
+# Main usage: `require "filename"` or `require "filename.rb"`. The file will be searched starting from the working
+# directory, which is the one where you launched the executable from.
+#
+# You can also require files relatively to the one currently in execution by prepending a "./". Example usage:
+# `require "./dir/filename"`. Similarly, you can search in the parent directory by prepending "../".
+#
+# If the file is not found, this method will raise a `RuntimeError`, giving information about the absolute path
+# of the file.
+#
+# @param file [String] the file to require.
+# @return [String] the absolute path of the required file, if found.
 def require file
-  puts "carico da: #{$__file}, percorso: #{$__dir}"
-
   if file.start_with? "./"
     if $__dir.nil?
       file = file[2..]
@@ -21,18 +33,13 @@ def require file
   raise "no such file or directory: #{path}" unless File.exist? path
   source = File.read path
 
-  _set_require_relative path do
-    puts "passo: #{$__file}, percorso: #{$__dir}"
+  begin
+    $__file = file
+    $__dir = File.dirname file
     eval source
+    $__file = file
+    $__dir = File.dirname file
   end
-end
 
-def _set_require_relative file
-  $__file = file
-  $__dir = File.dirname file
-
-  yield if block_given?
-
-  $__file = file
-  $__dir = File.dirname file
+  path
 end
