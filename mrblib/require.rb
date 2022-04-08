@@ -23,7 +23,6 @@ def require file
     unless $__dir.nil?
       parent_dir = File.expand_path "#{$__dir}/../"
       file = "#{parent_dir}/#{file[3..]}"
-      puts "parent dir: #{parent_dir}, #{file}"
     end
   end
 
